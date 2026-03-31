@@ -27,14 +27,17 @@ fi
 # 2. Download release
 echo "[2/4] Downloading HarmonyCode v$VERSION..."
 mkdir -p "$INSTALL_DIR"
-curl -fSL "$RELEASE_URL" | tar xz -C "$INSTALL_DIR"
-chmod -R 755 "$INSTALL_DIR"
+TMP_FILE="$(mktemp /tmp/harmonycode-XXXXXX.tar.gz)"
+curl -fSL -o "$TMP_FILE" "$RELEASE_URL"
+tar xzf "$TMP_FILE" -C "$INSTALL_DIR"
+rm -f "$TMP_FILE"
+chmod 644 "$INSTALL_DIR/package.json"
+chmod 644 "$INSTALL_DIR/cli.js"
 
 # 3. Install runtime dependencies
 echo "[3/4] Installing dependencies..."
 cd "$INSTALL_DIR"
 bun install 2>&1 | tail -1
-chmod -R 755 "$INSTALL_DIR"
 
 # 4. Create launcher
 echo "[4/4] Installing CLI command..."
