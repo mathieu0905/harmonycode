@@ -28,12 +28,13 @@ fi
 echo "[2/4] Downloading HarmonyCode v$VERSION..."
 mkdir -p "$INSTALL_DIR"
 curl -fSL "$RELEASE_URL" | tar xz -C "$INSTALL_DIR"
-chmod +x "$INSTALL_DIR/cli.js"
+chmod -R 755 "$INSTALL_DIR"
 
 # 3. Install runtime dependencies
 echo "[3/4] Installing dependencies..."
 cd "$INSTALL_DIR"
 bun install 2>&1 | tail -1
+chmod -R 755 "$INSTALL_DIR"
 
 # 4. Create launcher
 echo "[4/4] Installing CLI command..."
