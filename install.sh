@@ -43,8 +43,14 @@ cat > "$BIN_DIR/harmonycode" << 'EOF'
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
 CLI="$HOME/.harmonycode-cli/cli.js"
-[ ! -x "$CLI" ] && chmod +x "$CLI" 2>/dev/null
-exec bun "$CLI" "$@"
+# Build JS that sets argv then imports the CLI
+ARGS="process.argv=['bun','cli.js'"
+for arg in "$@"; do
+  escaped=$(printf '%s' "$arg" | sed "s/'/\\\\'/g")
+  ARGS="$ARGS,'$escaped'"
+done
+ARGS="$ARGS]"
+exec bun -e "$ARGS; await import('$CLI')"
 EOF
 chmod +x "$BIN_DIR/harmonycode"
 
