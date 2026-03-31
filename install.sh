@@ -42,8 +42,8 @@ cat > "$BIN_DIR/harmonycode" << 'EOF'
 #!/bin/bash
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
-export _HARMONYCODE_ARGS="$*"
-exec bun -e "process.argv = ['bun', 'harmonycode', ...process.env._HARMONYCODE_ARGS.split(/\s+/).filter(Boolean)]; await import('file://' + process.env.HOME + '/.harmonycode-cli/cli.js')"
+export _HC_ARGS="$*"
+exec bun -e "process.argv=['bun','harmonycode',...(process.env._HC_ARGS||'').split(/\s+/).filter(Boolean)];require(process.env.HOME+'/.harmonycode-cli/cli.js')"
 EOF
 chmod +x "$BIN_DIR/harmonycode"
 
