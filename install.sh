@@ -43,7 +43,7 @@ cat > "$BIN_DIR/harmonycode" << 'LAUNCHER'
 #!/bin/bash
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
-TTY_FIX='if(!process.stdin.isTTY){try{process.stdin.destroy();Object.defineProperty(process,"stdin",{value:new(require("tty").ReadStream)(require("fs").openSync("/dev/tty","r"))})}catch(e){}}'
+TTY_FIX='try{var _hcFs=require("fs"),_hcTty=require("tty"),_hcFd=_hcFs.openSync("/dev/tty","r+"),_hcIn=new _hcTty.ReadStream(_hcFd),_hcOut=new _hcTty.WriteStream(_hcFd);process.stdin.destroy();Object.defineProperty(process,"stdin",{value:_hcIn,configurable:true});if(!process.stdout.isTTY){Object.defineProperty(process,"stdout",{value:_hcOut,configurable:true})}}catch(e){}'
 { echo "$TTY_FIX"; tail -n +2 "$HOME/.harmonycode-cli/cli.js"; } | exec bun - "$@"
 LAUNCHER
 chmod +x "$BIN_DIR/harmonycode"
