@@ -2,6 +2,7 @@
 # HarmonyCode installer
 # Usage: curl -fsSL https://raw.githubusercontent.com/mathieu0905/harmonycode/main/install.sh | bash
 set -e
+umask 022
 
 VERSION="0.0.1"
 REPO="mathieu0905/harmonycode"
@@ -31,8 +32,10 @@ TMP_FILE="$(mktemp /tmp/harmonycode-XXXXXX.tar.gz)"
 curl -fSL -o "$TMP_FILE" "$RELEASE_URL"
 tar xzf "$TMP_FILE" -C "$INSTALL_DIR"
 rm -f "$TMP_FILE"
-chmod 644 "$INSTALL_DIR/package.json"
-chmod 644 "$INSTALL_DIR/cli.js"
+
+# Fix permissions (some systems have restrictive umask)
+chmod -R u+rw "$INSTALL_DIR"
+chown -R "$(id -u):$(id -g)" "$INSTALL_DIR" 2>/dev/null || true
 
 # 3. Install runtime dependencies
 echo "[3/4] Installing dependencies..."
