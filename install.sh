@@ -42,7 +42,7 @@ cat > "$BIN_DIR/harmonycode" << 'EOF'
 #!/bin/bash
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
-exec bun "$HOME/.harmonycode-cli/cli.js" "$@"
+exec bun run "$HOME/.harmonycode-cli/cli.js" "$@"
 EOF
 chmod +x "$BIN_DIR/harmonycode"
 
