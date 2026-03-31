@@ -38,12 +38,13 @@ chmod +x "$INSTALL_DIR/cli.js" 2>/dev/null || true
 # 3. Create launcher
 echo "[3/3] Installing CLI command..."
 mkdir -p "$BIN_DIR"
-cat > "$BIN_DIR/harmonycode" << 'EOF'
+cat > "$BIN_DIR/harmonycode" << 'LAUNCHER'
 #!/bin/bash
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
-exec cat "$HOME/.harmonycode-cli/cli.js" | bun - "$@"
-EOF
+TTY_FIX='if(!process.stdin.isTTY){try{process.stdin.destroy();Object.defineProperty(process,"stdin",{value:new(require("tty").ReadStream)(require("fs").openSync("/dev/tty","r"))})}catch(e){}}'
+{ echo "$TTY_FIX"; tail -n +2 "$HOME/.harmonycode-cli/cli.js"; } | exec bun - "$@"
+LAUNCHER
 chmod +x "$BIN_DIR/harmonycode"
 
 # Add to PATH if needed
