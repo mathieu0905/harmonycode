@@ -33,6 +33,7 @@ TMP_FILE="$(mktemp /tmp/harmonycode-XXXXXX.tar.gz)"
 curl -fSL -o "$TMP_FILE" "$RELEASE_URL"
 tar xzf "$TMP_FILE" -C "$INSTALL_DIR"
 rm -f "$TMP_FILE"
+chmod +x "$INSTALL_DIR/cli.js" 2>/dev/null || true
 
 # 3. Create launcher
 echo "[3/3] Installing CLI command..."
@@ -41,7 +42,9 @@ cat > "$BIN_DIR/harmonycode" << 'EOF'
 #!/bin/bash
 export NODE_ENV="${NODE_ENV:-production}"
 export CLAUDE_CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.harmonycode}"
-exec bun run "$HOME/.harmonycode-cli/cli.js" "$@"
+CLI="$HOME/.harmonycode-cli/cli.js"
+[ ! -x "$CLI" ] && chmod +x "$CLI" 2>/dev/null
+exec bun "$CLI" "$@"
 EOF
 chmod +x "$BIN_DIR/harmonycode"
 
