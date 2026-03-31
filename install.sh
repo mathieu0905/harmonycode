@@ -17,33 +17,25 @@ echo ""
 
 # 1. Install Bun if needed
 if ! command -v bun &> /dev/null; then
-  echo "[1/4] Installing Bun runtime..."
+  echo "[1/3] Installing Bun runtime..."
   curl -fsSL https://bun.sh/install | bash
   export BUN_INSTALL="$HOME/.bun"
   export PATH="$BUN_INSTALL/bin:$PATH"
 else
-  echo "[1/4] Bun $(bun --version) ✓"
+  echo "[1/3] Bun $(bun --version) ✓"
 fi
 
-# 2. Download release
-echo "[2/4] Downloading HarmonyCode v$VERSION..."
+# 2. Download & extract (includes node_modules, no bun install needed)
+echo "[2/3] Downloading HarmonyCode v$VERSION..."
+rm -rf "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"
 TMP_FILE="$(mktemp /tmp/harmonycode-XXXXXX.tar.gz)"
 curl -fSL -o "$TMP_FILE" "$RELEASE_URL"
 tar xzf "$TMP_FILE" -C "$INSTALL_DIR"
 rm -f "$TMP_FILE"
 
-# Fix permissions (some systems have restrictive umask)
-chmod -R u+rw "$INSTALL_DIR"
-chown -R "$(id -u):$(id -g)" "$INSTALL_DIR" 2>/dev/null || true
-
-# 3. Install runtime dependencies
-echo "[3/4] Installing dependencies..."
-cd "$INSTALL_DIR"
-bun install 2>&1 | tail -1
-
-# 4. Create launcher
-echo "[4/4] Installing CLI command..."
+# 3. Create launcher
+echo "[3/3] Installing CLI command..."
 mkdir -p "$BIN_DIR"
 cat > "$BIN_DIR/harmonycode" << 'EOF'
 #!/bin/bash
@@ -54,17 +46,8 @@ EOF
 chmod +x "$BIN_DIR/harmonycode"
 
 # Add to PATH if needed
-NEED_PATH=false
 if ! echo "$PATH" | tr ':' '\n' | grep -qx "$BIN_DIR"; then
-  NEED_PATH=true
   export PATH="$BIN_DIR:$PATH"
-fi
-
-echo ""
-echo "  ✅ HarmonyCode v$VERSION installed!"
-echo ""
-
-if [ "$NEED_PATH" = true ]; then
   SHELL_NAME="$(basename "$SHELL")"
   case "$SHELL_NAME" in
     zsh)  SHELL_RC="$HOME/.zshrc" ;;
@@ -76,9 +59,11 @@ if [ "$NEED_PATH" = true ]; then
     echo "  ✓ Added ~/.local/bin to PATH in $(basename $SHELL_RC)"
     echo "  Run: source $SHELL_RC"
   fi
-  echo ""
 fi
 
+echo ""
+echo "  ✅ HarmonyCode v$VERSION installed!"
+echo ""
 echo "  Quick start:"
 echo "    harmonycode setup          # 配置 API"
 echo "    harmonycode                # 交互模式"
