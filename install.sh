@@ -28,6 +28,7 @@ fi
 echo "[2/4] Downloading HarmonyCode v$VERSION..."
 mkdir -p "$INSTALL_DIR"
 curl -fSL "$RELEASE_URL" | tar xz -C "$INSTALL_DIR"
+chmod +x "$INSTALL_DIR/cli.js"
 
 # 3. Install runtime dependencies
 echo "[3/4] Installing dependencies..."
@@ -57,11 +58,16 @@ echo "  ✅ HarmonyCode v$VERSION installed!"
 echo ""
 
 if [ "$NEED_PATH" = true ]; then
-  SHELL_RC="$HOME/.zshrc"
-  [ -n "$BASH_VERSION" ] && SHELL_RC="$HOME/.bashrc"
+  SHELL_NAME="$(basename "$SHELL")"
+  case "$SHELL_NAME" in
+    zsh)  SHELL_RC="$HOME/.zshrc" ;;
+    bash) SHELL_RC="$HOME/.bashrc" ;;
+    *)    SHELL_RC="$HOME/.profile" ;;
+  esac
   if ! grep -q '.local/bin' "$SHELL_RC" 2>/dev/null; then
     echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$SHELL_RC"
     echo "  ✓ Added ~/.local/bin to PATH in $(basename $SHELL_RC)"
+    echo "  Run: source $SHELL_RC"
   fi
   echo ""
 fi
