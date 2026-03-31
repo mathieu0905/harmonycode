@@ -35,8 +35,9 @@ tar xzf "$TMP_FILE" -C "$INSTALL_DIR"
 rm -f "$TMP_FILE"
 chmod +x "$INSTALL_DIR/cli.js" 2>/dev/null || true
 
-# 3. Create launcher
+# 3. Create config dir and launcher
 echo "[3/3] Installing CLI command..."
+mkdir -p "$HOME/.harmonycode"
 mkdir -p "$BIN_DIR"
 cat > "$BIN_DIR/harmonycode" << 'LAUNCHER'
 #!/bin/bash
